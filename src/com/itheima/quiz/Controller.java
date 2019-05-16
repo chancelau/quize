@@ -1,25 +1,33 @@
 package com.itheima.quiz;
 
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.io.InputStreamReader;
+import java.util.*;
 
 public class Controller {
     private static ArrayList<String> QA = new ArrayList<>();
+    public static final int state_begin = 100;//开始
+    public static final int state_choose_quiz = 103; //选题
+    public static final int state_begin_answer = 104; //开始答题
 
-    static {
+    public static final int state_time_stop = 101;//计时结束
+    public static final int state_show_answer = 102;//显示答案，答题结束
+    private long period = 1000;
+
+
+    private static void initialQA() {
         try {
-            BufferedReader br = new BufferedReader(new FileReader("QALibs.txt"));
+            InputStreamReader isr = new InputStreamReader(Controller.class.getClassLoader().getResourceAsStream("QALibs.txt"), "utf8");
+            BufferedReader br = new BufferedReader(isr);
+
             String qa;
             while ((qa = br.readLine()) != null) {
                 QA.add(qa);
@@ -31,45 +39,107 @@ public class Controller {
         Collections.shuffle(QA);
     }
 
-
     @FXML
     Button button;
-
     @FXML
-    Label label_question,label_answer;
-
-
-    int index;
-    String[] q_a;
+    Label label_question, label_answer, label_time;
+    int current_state = state_begin;
 
     @FXML
     protected void click() throws Exception {
-        showQuestion();
+        // showQuestion();
+        if (current_state == state_begin) {
+            initialQA();
+            refresh(state_choose_quiz);
+        } else if (current_state == state_choose_quiz) {
+            //选题
+            chooseQuiz();
+        } else if (current_state == state_begin_answer) {//
+            // 答题结束
+            answerOver();
+        }
     }
 
-    public void showQuestion() {
-        if (index == 2) {
-            label_answer.setText(q_a[index]);
-            index = 0;
-            button.setText("下一题");
-            return;
-        }
+    /**
+     * 答题结束
+     */
+    private void answerOver() {
+        stopTimeCounting();//停止计时
+        refresh(state_choose_quiz);
+        label_answer.setText(currentQuiz.getAnswer());
+    }
 
+    /**
+     * 当前题目
+     */
+    Quiz currentQuiz;
+
+    public void chooseQuiz() {
+        label_answer.setText("稍后呈上答案！！");
         if (QA.size() > 0) {
             String qa = QA.remove(0);
-            q_a = qa.split("\t");
-            System.out.println(Arrays.toString(q_a));
-            index = 1;
-            label_question.setText(q_a[index]);
-            label_answer.setText("");
-            index++;
-            button.setText("参考答案");
+            String[] q_a = qa.split("\t");
+            currentQuiz = new Quiz(q_a[0], q_a[1]);
+            label_question.setText(currentQuiz.getQuestion());
+            startTimeCounting();//开始计时
+            refresh(state_begin_answer);
         } else {
-            label_question.setText("知识竞赛结束！！");
-            label_answer.setText("");
+            label_question.setText("比赛结束");
+            label_answer.setText("多谢参与");
             button.setVisible(false);
         }
     }
 
+    public void refresh(int state) {
+        current_state = state;
+        switch (state) {
+            case state_begin:
+                button.setText("开始");
+                break;
+            case state_choose_quiz:
+                button.setText("选题");
+                break;
+            case state_begin_answer:
+                button.setText("结束答题");
+                break;
+        }
+    }
 
+
+    //计时器
+    int time = 60;
+    Timer timer = new Timer();
+    TimerTask task = null;
+
+    /*
+    开始计时
+     */
+    public void startTimeCounting() {
+        if (task != null) {
+            task.cancel();
+        }
+        time = 60;
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                if (time < 1) {
+                    cancel();
+                    //答题结束
+                    Platform.runLater(() -> answerOver());
+                    return;
+                }
+                Platform.runLater(() -> label_time.setText(--time + ""));
+            }
+        };
+        timer.schedule(task, 0, period);
+    }
+
+    /**
+     * 结束计时
+     */
+    public void stopTimeCounting() {
+        if (task != null) {
+            task.cancel();
+        }
+    }
 }

@@ -26,7 +26,7 @@ public class Main extends Application {
         Controller controller = fxmlLoader.<Controller>getController();
         //Parent root = FXMLLoader.load(getClass().getResource("main_ui.fxml"));
         primaryStage.setTitle("知识竞赛");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.setResizable(false);
         primaryStage.show();
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {

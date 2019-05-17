@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -20,7 +21,7 @@ public class Controller {
 
     public static final int state_time_stop = 101;//计时结束
     public static final int state_show_answer = 102;//显示答案，答题结束
-    private long period = 1000;
+    private long period = 1;
 
 
     private static void initialQA() {
@@ -46,6 +47,8 @@ public class Controller {
     int current_state = state_begin;
 
     @FXML
+    ImageView img_haibao;
+    @FXML
     protected void click() throws Exception {
         // showQuestion();
         if (current_state == state_begin) {
@@ -69,6 +72,10 @@ public class Controller {
         label_answer.setText(currentQuiz.getAnswer());
     }
 
+    public void beginGame() {
+        refresh(state_begin);
+        img_haibao.setVisible(false);
+    }
     /**
      * 当前题目
      */
@@ -107,7 +114,7 @@ public class Controller {
 
 
     //计时器
-    int time = 60;
+    int time = 60_000;
     Timer timer = new Timer();
     TimerTask task = null;
 
@@ -118,7 +125,7 @@ public class Controller {
         if (task != null) {
             task.cancel();
         }
-        time = 60;
+        time = 60_000;
         task = new TimerTask() {
             @Override
             public void run() {
@@ -128,7 +135,11 @@ public class Controller {
                     Platform.runLater(() -> answerOver());
                     return;
                 }
-                Platform.runLater(() -> label_time.setText(--time + ""));
+
+                String timeStr = --time/1000 + ":"+time%1000;
+                Platform.runLater(() -> {
+                    label_time.setText("您还剩下时间："+timeStr);
+                });
             }
         };
         timer.schedule(task, 0, period);

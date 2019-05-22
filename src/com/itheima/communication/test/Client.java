@@ -1,4 +1,4 @@
-package com.itheima.test;
+package com.itheima.communication.test;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -1,4 +1,4 @@
-package com.itheima.udp;
+package com.itheima.communication.udp;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;

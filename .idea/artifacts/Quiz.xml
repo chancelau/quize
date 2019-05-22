@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="javafx" build-on-make="true" name="Quiz">
+  <artifact type="javafx" name="Quiz">
     <output-path>$PROJECT_DIR$/out/artifacts/Quiz</output-path>
     <properties id="javafx-properties">
       <options>

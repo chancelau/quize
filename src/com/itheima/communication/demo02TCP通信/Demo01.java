@@ -1,4 +1,4 @@
-package com.itheima.demo02TCP通信;
+package com.itheima.communication.demo02TCP通信;
 /*
    客户端发送一条信息给服务端，服务端收到信息后回复一条信息给客户端
 

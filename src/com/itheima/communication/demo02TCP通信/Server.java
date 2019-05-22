@@ -1,4 +1,4 @@
-package com.itheima.demo02TCP通信;
+package com.itheima.communication.demo02TCP通信;
 
 import java.io.IOException;
 import java.io.InputStream;
